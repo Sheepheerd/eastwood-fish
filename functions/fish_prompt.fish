@@ -1,28 +1,63 @@
-function fish_prompt
-    set -l blue (set_color blue)
-    set -l yellow (set_color yellow)
-    set -l red (set_color red)
-    set -l green (set_color green)
-    set -l normal (set_color normal)
+# name: Eastwood (Taken from Integral)
+function _git_branch_name
+  echo (command git symbolic-ref HEAD 2> /dev/null | sed -e 's|^refs/heads/||')
+end
 
-    set -l arrow "∫"
-    set -l cwd $blue(prompt_pwd)
+function _upstream_count
+  echo (command git rev-list --count --left-right origin/(_git_branch_name) 2> /dev/null)
+end
 
-    set -l git_branch (_git_branch_name)
-    set -l git_vs_upstream (_git_up_info)
-    set -l dirty (_is_git_dirty)
+function _git_up_info
+  if [ (_upstream_count) ]
+    set -l count (_upstream_count)
 
-    if test -n "$git_branch"
-        if test -n "$dirty"
-            set git_info $yellow'('$git_branch "±" "$git_vs_upstream"')' $normal
-        else if test -n "$git_vs_upstream"
-            set git_info $yellow'('$git_branch "$git_vs_upstream"')' $normal
-        else
-            set git_info $green'('$git_branch')' $normal
-        end
-    else
-        set git_info ''
+
+    if test -z "$count"
+        echo ''
+
+    else if string match -rq '^0.0$' -- $count
+        echo ''
+    else if string match -rq '^0..$' -- $count
+        echo '+'
+    else if string match -rq '^..0$' -- $count
+            echo '-'
     end
 
-    echo -n -s $cwd' ' "$git_info" $arrow ' '
+  end
+end
+
+function _is_git_dirty
+  echo (command git status -s --ignore-submodules=dirty 2> /dev/null)
+end
+
+function fish_prompt
+  set -l blue (set_color blue)
+  set -l normal (set_color normal)
+  set -l green (set_color green)
+  set -l red (set_color red)
+
+  set -l cwd $blue"["(prompt_pwd)"]\$"
+
+  if [ (_git_branch_name) ]
+    set -l git_branch (_git_branch_name)
+    set -l git_vs_upstream (_git_up_info)
+
+    if [ (_is_git_dirty) ]
+      set git_info $red'('$git_branch"$git_vs_upstream"')'
+    else if [ (_git_up_info) ]
+      set git_info $green'('$git_branch "$git_vs_upstream"')'
+    else
+      set git_info $green'('$git_branch')'
+    end
+  end
+
+  echo -n -s "$git_info"$cwd'' $normal' '
+end
+
+function fish_right_prompt
+  set -l dark_gray (set_color 222)
+  set -l green (set_color green)
+
+  echo -n -s $green ' ['(date +%H:%M:%S)'] '
+
 end
