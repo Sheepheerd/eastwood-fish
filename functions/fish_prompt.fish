@@ -4,7 +4,7 @@ function _git_branch_name
 end
 
 function _upstream_count
-  echo (command git rev-list --count --left-right origin/(_git_branch_name) 2> /dev/null)
+  echo (command git rev-list --count --left-right origin/(_git_branch_name)...HEAD 2> /dev/null)
 end
 
 function _git_up_info
@@ -45,7 +45,7 @@ function fish_prompt
     if [ (_is_git_dirty) ]
       set git_info $red'('$git_branch"$git_vs_upstream"')'
     else if [ (_git_up_info) ]
-      set git_info $green'('$git_branch "$git_vs_upstream"')'
+      set git_info $green'('$git_branch"$git_vs_upstream"')'
     else
       set git_info $green'('$git_branch')'
     end
