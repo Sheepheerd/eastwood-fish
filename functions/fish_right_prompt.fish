@@ -1,14 +1,11 @@
 function fish_right_prompt
+    set -l yellow (set_color yellow)
+    set -l red (set_color red)
+    set -l normal (set_color normal)
+
     if test -s ~/.rvm/scripts/rvm
-        set_color yellow
-        echo -n "rvm:"
-        set_color red
-        echo -n (command ~/.rvm/bin/rvm-prompt)
+        echo -n "$yellow"rvm":"$red(command ~/.rvm/bin/rvm-prompt)"$normal"
     else if type -q rbenv
-        set_color yellow
-        echo -n "rbenv:"
-        set_color red
-        echo -n (rbenv version | sed -e 's/ (set.*$//')
+        echo -n "$yellow"rbenv":"$red(rbenv version | string replace -r ' \(set.*$' '')"$normal"
     end
-    set_color normal
 end
