@@ -58,6 +58,6 @@ function fish_right_prompt
   set -l dark_gray (set_color 222)
   set -l green (set_color green)
 
-  echo -n -s $green ' ['(date +%H:%M:%S)'] '
+  echo -n -s $green
 
 end
